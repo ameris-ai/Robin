@@ -1,4 +1,4 @@
-[中文教程](README.md) | [English Tutorial](README.en.md)
+[中文教程](README.zh.md) | [English Tutorial](README.md)
 
 # ROBIN · Agricultural Robot AI Dialogue Module
 
