@@ -225,34 +225,34 @@ Running both functions on one board requires integrating the vision and voice fi
 
 ### Using the Firmware and Source Files in This Repository
 
-The uploaded [`Xiaozhi-for-XiaoESP32S3-master`](Xiaozhi-for-XiaoESP32S3-master/) directory contains both ready-to-flash firmware and the corresponding source project:
+The uploaded [`Robin_main`](Robin_main/) directory contains both ready-to-flash firmware and the corresponding source project:
 
 | Path | Contents and use |
 | --- | --- |
-| [`Firmware/`](Xiaozhi-for-XiaoESP32S3-master/Firmware/) | Windows flashing tools, the five firmware images, and the verified flash-address command |
-| [`Source/xiaozhi-esp32-2.2.2/`](Xiaozhi-for-XiaoESP32S3-master/Source/xiaozhi-esp32-2.2.2/) | Complete ESP-IDF project for rebuilding or changing pins, display behavior, and device features |
-| [`main/boards/seeedstudio-s3-wifi/`](Xiaozhi-for-XiaoESP32S3-master/Source/xiaozhi-esp32-2.2.2/main/boards/seeedstudio-s3-wifi/) | XIAO ESP32-S3 board definition and 128×32/128×64 OLED build configurations |
-| [`circuit.png`](Xiaozhi-for-XiaoESP32S3-master/circuit.png) | Reference wiring diagram |
+| [`Firmware/`](Robin_main/Firmware/) | Windows flashing tools, the five firmware images, and the verified flash-address command |
+| [`Source/xiaozhi-esp32-2.2.2/`](Robin_main/Source/xiaozhi-esp32-2.2.2/) | Complete ESP-IDF project for rebuilding or changing pins, display behavior, and device features |
+| [`main/boards/seeedstudio-s3-wifi/`](Robin_main/Source/xiaozhi-esp32-2.2.2/main/boards/seeedstudio-s3-wifi/) | XIAO ESP32-S3 board definition and 128×32/128×64 OLED build configurations |
+| [`circuit.png`](Robin_main/circuit.png) | Reference wiring diagram |
 
 Clone the complete repository before using these files:
 
 ```sh
 git clone https://github.com/ameris-ai/Robin.git
-cd Robin/Xiaozhi-for-XiaoESP32S3-master
+cd Robin/Robin_main
 ```
 
 #### Flash the Included Precompiled Firmware on Windows 10
 
 1. Confirm that the board is a XIAO ESP32-S3 and that its wiring matches the pin table below. Connect it with a USB data cable and close any program using its serial port.
 2. Open Device Manager and note the assigned port, such as `COM5`.
-3. Open PowerShell or Command Prompt in `Xiaozhi-for-XiaoESP32S3-master/Firmware`.
+3. Open PowerShell or Command Prompt in `Robin_main/Firmware`.
 4. Replace `COM5` in the following command with the actual port, then run it:
 
 ```powershell
 .\esptool.exe --chip esp32s3 --port COM5 --baud 921600 write_flash 0x0 bootloader.bin 0x8000 partition-table.bin 0xD000 ota_data_initial.bin 0x20000 xiaozhi.bin 0x600000 generated_assets.bin
 ```
 
-The addresses above are taken from the included [`flash_code.txt`](Xiaozhi-for-XiaoESP32S3-master/Firmware/flash_code.txt). Keep each filename paired with its address. This operation replaces the existing device firmware; do not use this package with a different board or partition layout.
+The addresses above are taken from the included [`flash_code.txt`](Robin_main/Firmware/flash_code.txt). Keep each filename paired with its address. This operation replaces the existing device firmware; do not use this package with a different board or partition layout.
 
 5. Reset the board after a successful write. Follow its screen, voice, or serial prompts to configure Wi-Fi, bind the device to the Xiaozhi service if requested, and then apply the Robin persona settings.
 
@@ -261,7 +261,7 @@ The addresses above are taken from the included [`flash_code.txt`](Xiaozhi-for-X
 The bundled XIAO board guide specifies ESP-IDF 5.4.1. Open an ESP-IDF terminal and enter the source directory:
 
 ```sh
-cd Robin/Xiaozhi-for-XiaoESP32S3-master/Source/xiaozhi-esp32-2.2.2
+cd Robin/Robin_main/Source/xiaozhi-esp32-2.2.2
 idf.py fullclean
 idf.py set-target esp32s3
 idf.py menuconfig
@@ -282,7 +282,7 @@ idf.py -p COM5 flash
 idf.py -p COM5 monitor
 ```
 
-Replace `COM5` with the actual port. The board-specific instructions are also available in the bundled [`seeedstudio-s3-wifi/README.md`](Xiaozhi-for-XiaoESP32S3-master/Source/xiaozhi-esp32-2.2.2/main/boards/seeedstudio-s3-wifi/README.md). Build output and precompiled images must not be mixed across different partition tables or display configurations.
+Replace `COM5` with the actual port. The board-specific instructions are also available in the bundled [`seeedstudio-s3-wifi/README.md`](Robin_main/Source/xiaozhi-esp32-2.2.2/main/boards/seeedstudio-s3-wifi/README.md). Build output and precompiled images must not be mixed across different partition tables or display configurations.
 
 ### Pin Connections
 
@@ -372,3 +372,4 @@ This project applies the reference voice hardware design to the ROBIN agricultur
 ### License
 
 Refer to [TechTalkies LICENSE](https://github.com/TechTalkies/Xiaozhi-for-XiaoESP32S3/blob/master/LICENSE) and [Xiaozhi LICENSE](https://github.com/78/xiaozhi-esp32/blob/main/LICENSE) for the reference projects' licenses. Preserve the licenses, copyright notices, and attribution for any code used. Permissions for project images and third-party assets should be documented separately.
+

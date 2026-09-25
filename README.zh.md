@@ -223,34 +223,34 @@ python /content/robin-ai-dialogue/vision/run_pipeline.py export --config /conten
 
 ### 使用仓库中新上传的固件与源码
 
-新上传的 [`Xiaozhi-for-XiaoESP32S3-master`](Xiaozhi-for-XiaoESP32S3-master/) 目录同时包含可直接烧录的固件和对应源码工程：
+新上传的 [`Robin_main`](Robin_main/) 目录同时包含可直接烧录的固件和对应源码工程：
 
 | 路径 | 内容与用途 |
 | --- | --- |
-| [`Firmware/`](Xiaozhi-for-XiaoESP32S3-master/Firmware/) | Windows 烧录工具、五个固件镜像及经过核对的烧录地址命令 |
-| [`Source/xiaozhi-esp32-2.2.2/`](Xiaozhi-for-XiaoESP32S3-master/Source/xiaozhi-esp32-2.2.2/) | 完整 ESP-IDF 工程，用于重新编译或修改引脚、显示及设备功能 |
-| [`main/boards/seeedstudio-s3-wifi/`](Xiaozhi-for-XiaoESP32S3-master/Source/xiaozhi-esp32-2.2.2/main/boards/seeedstudio-s3-wifi/) | XIAO ESP32-S3 板级定义及 128×32/128×64 两种 OLED 构建配置 |
-| [`circuit.png`](Xiaozhi-for-XiaoESP32S3-master/circuit.png) | 参考接线图 |
+| [`Firmware/`](Robin_main/Firmware/) | Windows 烧录工具、五个固件镜像及经过核对的烧录地址命令 |
+| [`Source/xiaozhi-esp32-2.2.2/`](Robin_main/Source/xiaozhi-esp32-2.2.2/) | 完整 ESP-IDF 工程，用于重新编译或修改引脚、显示及设备功能 |
+| [`main/boards/seeedstudio-s3-wifi/`](Robin_main/Source/xiaozhi-esp32-2.2.2/main/boards/seeedstudio-s3-wifi/) | XIAO ESP32-S3 板级定义及 128×32/128×64 两种 OLED 构建配置 |
+| [`circuit.png`](Robin_main/circuit.png) | 参考接线图 |
 
 使用这些文件前，先克隆完整仓库：
 
 ```sh
 git clone https://github.com/ameris-ai/Robin.git
-cd Robin/Xiaozhi-for-XiaoESP32S3-master
+cd Robin/Robin_main
 ```
 
 #### 在 Windows 10 烧录仓库内的预编译固件
 
 1. 确认开发板为 XIAO ESP32-S3，且接线与下方引脚表一致。使用支持数据传输的 USB 线连接开发板，并关闭占用串口的软件。
 2. 在设备管理器中查看开发板端口，例如 `COM5`。
-3. 在 `Xiaozhi-for-XiaoESP32S3-master/Firmware` 目录打开 PowerShell 或命令提示符。
+3. 在 `Robin_main/Firmware` 目录打开 PowerShell 或命令提示符。
 4. 将以下命令中的 `COM5` 替换为实际端口并执行：
 
 ```powershell
 .\esptool.exe --chip esp32s3 --port COM5 --baud 921600 write_flash 0x0 bootloader.bin 0x8000 partition-table.bin 0xD000 ota_data_initial.bin 0x20000 xiaozhi.bin 0x600000 generated_assets.bin
 ```
 
-以上地址来自仓库中的 [`flash_code.txt`](Xiaozhi-for-XiaoESP32S3-master/Firmware/flash_code.txt)。每个文件名必须与对应地址保持配对。该操作会替换设备上的现有固件，不要将此固件包用于其他开发板或不同分区布局。
+以上地址来自仓库中的 [`flash_code.txt`](Robin_main/Firmware/flash_code.txt)。每个文件名必须与对应地址保持配对。该操作会替换设备上的现有固件，不要将此固件包用于其他开发板或不同分区布局。
 
 5. 写入成功后复位开发板。根据屏幕、语音或串口提示完成 Wi-Fi 配置；若系统要求，在小智服务中绑定设备，然后应用 Robin 的角色配置。
 
@@ -259,7 +259,7 @@ cd Robin/Xiaozhi-for-XiaoESP32S3-master
 仓库内的 XIAO 板级说明指定 ESP-IDF 5.4.1。打开 ESP-IDF 终端并进入源码目录：
 
 ```sh
-cd Robin/Xiaozhi-for-XiaoESP32S3-master/Source/xiaozhi-esp32-2.2.2
+cd Robin/Robin_main/Source/xiaozhi-esp32-2.2.2
 idf.py fullclean
 idf.py set-target esp32s3
 idf.py menuconfig
@@ -280,7 +280,7 @@ idf.py -p COM5 flash
 idf.py -p COM5 monitor
 ```
 
-将 `COM5` 替换为实际端口。板级操作说明也可查看仓库内的 [`seeedstudio-s3-wifi/README.md`](Xiaozhi-for-XiaoESP32S3-master/Source/xiaozhi-esp32-2.2.2/main/boards/seeedstudio-s3-wifi/README.md)。不同分区表或显示配置生成的编译产物不能与预编译镜像混用。
+将 `COM5` 替换为实际端口。板级操作说明也可查看仓库内的 [`seeedstudio-s3-wifi/README.md`](Robin_main/Source/xiaozhi-esp32-2.2.2/main/boards/seeedstudio-s3-wifi/README.md)。不同分区表或显示配置生成的编译产物不能与预编译镜像混用。
 
 ### 引脚连接
 
@@ -370,3 +370,4 @@ INMP441 的 `L/R` 声道选择脚需要与固件采集声道匹配。功放的�
 ### 许可证
 
 参考项目的许可证文件分别见 [TechTalkies LICENSE](https://github.com/TechTalkies/Xiaozhi-for-XiaoESP32S3/blob/master/LICENSE) 与[小智 LICENSE](https://github.com/78/xiaozhi-esp32/blob/main/LICENSE)。发布时保留所使用代码的许可证、版权声明和来源；项目图片与第三方素材的授权另行注明。
+
