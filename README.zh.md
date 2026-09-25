@@ -221,6 +221,67 @@ python /content/robin-ai-dialogue/vision/run_pipeline.py export --config /conten
 
 ## 3. 硬件连通、组装与烧录
 
+### 使用仓库中新上传的固件与源码
+
+新上传的 [`Xiaozhi-for-XiaoESP32S3-master`](Xiaozhi-for-XiaoESP32S3-master/) 目录同时包含可直接烧录的固件和对应源码工程：
+
+| 路径 | 内容与用途 |
+| --- | --- |
+| [`Firmware/`](Xiaozhi-for-XiaoESP32S3-master/Firmware/) | Windows 烧录工具、五个固件镜像及经过核对的烧录地址命令 |
+| [`Source/xiaozhi-esp32-2.2.2/`](Xiaozhi-for-XiaoESP32S3-master/Source/xiaozhi-esp32-2.2.2/) | 完整 ESP-IDF 工程，用于重新编译或修改引脚、显示及设备功能 |
+| [`main/boards/seeedstudio-s3-wifi/`](Xiaozhi-for-XiaoESP32S3-master/Source/xiaozhi-esp32-2.2.2/main/boards/seeedstudio-s3-wifi/) | XIAO ESP32-S3 板级定义及 128×32/128×64 两种 OLED 构建配置 |
+| [`circuit.png`](Xiaozhi-for-XiaoESP32S3-master/circuit.png) | 参考接线图 |
+
+使用这些文件前，先克隆完整仓库：
+
+```sh
+git clone https://github.com/ameris-ai/Robin.git
+cd Robin/Xiaozhi-for-XiaoESP32S3-master
+```
+
+#### 在 Windows 10 烧录仓库内的预编译固件
+
+1. 确认开发板为 XIAO ESP32-S3，且接线与下方引脚表一致。使用支持数据传输的 USB 线连接开发板，并关闭占用串口的软件。
+2. 在设备管理器中查看开发板端口，例如 `COM5`。
+3. 在 `Xiaozhi-for-XiaoESP32S3-master/Firmware` 目录打开 PowerShell 或命令提示符。
+4. 将以下命令中的 `COM5` 替换为实际端口并执行：
+
+```powershell
+.\esptool.exe --chip esp32s3 --port COM5 --baud 921600 write_flash 0x0 bootloader.bin 0x8000 partition-table.bin 0xD000 ota_data_initial.bin 0x20000 xiaozhi.bin 0x600000 generated_assets.bin
+```
+
+以上地址来自仓库中的 [`flash_code.txt`](Xiaozhi-for-XiaoESP32S3-master/Firmware/flash_code.txt)。每个文件名必须与对应地址保持配对。该操作会替换设备上的现有固件，不要将此固件包用于其他开发板或不同分区布局。
+
+5. 写入成功后复位开发板。根据屏幕、语音或串口提示完成 Wi-Fi 配置；若系统要求，在小智服务中绑定设备，然后应用 Robin 的角色配置。
+
+#### 从仓库源码编译并烧录
+
+仓库内的 XIAO 板级说明指定 ESP-IDF 5.4.1。打开 ESP-IDF 终端并进入源码目录：
+
+```sh
+cd Robin/Xiaozhi-for-XiaoESP32S3-master/Source/xiaozhi-esp32-2.2.2
+idf.py fullclean
+idf.py set-target esp32s3
+idf.py menuconfig
+```
+
+在 `menuconfig` 中设置：
+
+- `Serial flasher config → Flash size → 8 MB`
+- `Partition Table → Custom partition CSV file → partitions/v2/8m.csv`
+- `Xiaozhi Assistant → Board Type → Seeed Studio XIAO ESP32-S3`
+- 本 README 硬件清单中的屏幕应选择 `OLED Type → SSD1306 128×64`；只有实物为 128×32 屏幕时才选择 128×32 配置。
+
+保存并退出配置界面，然后执行：
+
+```sh
+idf.py build
+idf.py -p COM5 flash
+idf.py -p COM5 monitor
+```
+
+将 `COM5` 替换为实际端口。板级操作说明也可查看仓库内的 [`seeedstudio-s3-wifi/README.md`](Xiaozhi-for-XiaoESP32S3-master/Source/xiaozhi-esp32-2.2.2/main/boards/seeedstudio-s3-wifi/README.md)。不同分区表或显示配置生成的编译产物不能与预编译镜像混用。
+
 ### 引脚连接
 
 下表来自教程对应的接线方案，**是参考接线，不是对当前实物接线的测量结果**。使用前必须确认固件的 GPIO 定义一致，尤其不能将开发板的 `D` 编号直接当成 GPIO 编号。
@@ -252,33 +313,6 @@ INMP441 的 `L/R` 声道选择脚需要与固件采集声道匹配。功放的�
 3. 将扬声器接到功放输出端，给麦克风与扬声器留出间距，减少回声干扰。
 4. 使用支持数据传输的 USB 线连接电脑，确认设备被识别。
 5. 完成烧录与桌面联调后，再固定到机器人外壳，保留拾音孔、出声孔及 USB 调试口。
-
-### 路径 A：烧录已编译固件
-
-适用于复现同一硬件配置、无需修改固件代码的情况。
-
-1. 从教程配套项目获取与开发板和接线配置匹配的固件包。
-2. 在 Windows 设备管理器中确认串口，例如 `COM5`。这个编号仅为示例。
-3. 按固件包说明选择芯片型号、串口、固件文件与写入地址，使用配套烧录脚本或工具。
-4. 若无法连接，按开发板说明进入下载模式后重试，并重新确认串口。
-5. 烧录完成后复位，观察 OLED 和串口日志。
-
-不要将其他板型固件直接用于本接线方案。合并镜像与独立应用镜像的烧录方式不同；写入地址以对应固件包说明为准。
-
-### 路径 B：从源码编译并烧录
-
-适用于需要修改引脚、显示或设备功能的情况。先安装与**实际使用的源码版本**匹配的 ESP-IDF；不要直接把最新上游依赖要求套用到旧版教程工程。
-
-在 ESP-IDF 终端中进入包含顶层 `CMakeLists.txt` 的工程目录。确认选择了对应 XIAO ESP32-S3 的板型、Flash/PSRAM、显示与音频配置后，按工程说明执行。典型命令如下，尚未在本仓库验证：
-
-```sh
-idf.py set-target esp32s3
-idf.py menuconfig
-idf.py build
-idf.py -p COM5 flash monitor
-```
-
-将 `COM5` 替换成实际端口。Mac/Linux 使用系统对应的串口设备路径。只有编译成功不代表硬件引脚匹配。
 
 ### 首次联网与角色配置
 

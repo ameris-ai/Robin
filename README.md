@@ -223,6 +223,67 @@ Running both functions on one board requires integrating the vision and voice fi
 
 ## 3. Hardware Connections, Assembly, and Flashing
 
+### Using the Firmware and Source Files in This Repository
+
+The uploaded [`Xiaozhi-for-XiaoESP32S3-master`](Xiaozhi-for-XiaoESP32S3-master/) directory contains both ready-to-flash firmware and the corresponding source project:
+
+| Path | Contents and use |
+| --- | --- |
+| [`Firmware/`](Xiaozhi-for-XiaoESP32S3-master/Firmware/) | Windows flashing tools, the five firmware images, and the verified flash-address command |
+| [`Source/xiaozhi-esp32-2.2.2/`](Xiaozhi-for-XiaoESP32S3-master/Source/xiaozhi-esp32-2.2.2/) | Complete ESP-IDF project for rebuilding or changing pins, display behavior, and device features |
+| [`main/boards/seeedstudio-s3-wifi/`](Xiaozhi-for-XiaoESP32S3-master/Source/xiaozhi-esp32-2.2.2/main/boards/seeedstudio-s3-wifi/) | XIAO ESP32-S3 board definition and 128×32/128×64 OLED build configurations |
+| [`circuit.png`](Xiaozhi-for-XiaoESP32S3-master/circuit.png) | Reference wiring diagram |
+
+Clone the complete repository before using these files:
+
+```sh
+git clone https://github.com/ameris-ai/Robin.git
+cd Robin/Xiaozhi-for-XiaoESP32S3-master
+```
+
+#### Flash the Included Precompiled Firmware on Windows 10
+
+1. Confirm that the board is a XIAO ESP32-S3 and that its wiring matches the pin table below. Connect it with a USB data cable and close any program using its serial port.
+2. Open Device Manager and note the assigned port, such as `COM5`.
+3. Open PowerShell or Command Prompt in `Xiaozhi-for-XiaoESP32S3-master/Firmware`.
+4. Replace `COM5` in the following command with the actual port, then run it:
+
+```powershell
+.\esptool.exe --chip esp32s3 --port COM5 --baud 921600 write_flash 0x0 bootloader.bin 0x8000 partition-table.bin 0xD000 ota_data_initial.bin 0x20000 xiaozhi.bin 0x600000 generated_assets.bin
+```
+
+The addresses above are taken from the included [`flash_code.txt`](Xiaozhi-for-XiaoESP32S3-master/Firmware/flash_code.txt). Keep each filename paired with its address. This operation replaces the existing device firmware; do not use this package with a different board or partition layout.
+
+5. Reset the board after a successful write. Follow its screen, voice, or serial prompts to configure Wi-Fi, bind the device to the Xiaozhi service if requested, and then apply the Robin persona settings.
+
+#### Build and Flash the Included Source
+
+The bundled XIAO board guide specifies ESP-IDF 5.4.1. Open an ESP-IDF terminal and enter the source directory:
+
+```sh
+cd Robin/Xiaozhi-for-XiaoESP32S3-master/Source/xiaozhi-esp32-2.2.2
+idf.py fullclean
+idf.py set-target esp32s3
+idf.py menuconfig
+```
+
+In `menuconfig`, set:
+
+- `Serial flasher config → Flash size → 8 MB`
+- `Partition Table → Custom partition CSV file → partitions/v2/8m.csv`
+- `Xiaozhi Assistant → Board Type → Seeed Studio XIAO ESP32-S3`
+- `OLED Type → SSD1306 128×64` for the display listed in this README. Select the 128×32 option only when that is the physical display in use.
+
+Save the configuration, exit, and run:
+
+```sh
+idf.py build
+idf.py -p COM5 flash
+idf.py -p COM5 monitor
+```
+
+Replace `COM5` with the actual port. The board-specific instructions are also available in the bundled [`seeedstudio-s3-wifi/README.md`](Xiaozhi-for-XiaoESP32S3-master/Source/xiaozhi-esp32-2.2.2/main/boards/seeedstudio-s3-wifi/README.md). Build output and precompiled images must not be mixed across different partition tables or display configurations.
+
 ### Pin Connections
 
 The following table comes from the tutorial's wiring scheme. **It is reference wiring, not a measurement of the current prototype's connections.** Confirm that the firmware GPIO definitions match before use. In particular, board `D` numbers must not be treated as GPIO numbers.
@@ -254,33 +315,6 @@ The INMP441 `L/R` channel selection must match the channel captured by the firmw
 3. Connect the speaker to the amplifier outputs. Leave space between the microphone and speaker to reduce acoustic feedback.
 4. Connect to the computer with a USB cable that supports data transfer and confirm that the device is recognized.
 5. After flashing and bench integration testing, mount the module in the robot enclosure, leaving openings for the microphone and speaker and access to the USB debugging port.
-
-### Option A: Flash Precompiled Firmware
-
-Use this option to reproduce the same hardware configuration without modifying firmware code.
-
-1. Obtain a firmware package from the tutorial's accompanying project that matches the board and wiring configuration.
-2. Find the serial port in Windows Device Manager, such as `COM5`. This port number is only an example.
-3. Follow the firmware package instructions to select the chip, serial port, firmware files, and flash addresses, using the supplied flashing script or tool.
-4. If the device cannot connect, enter download mode according to the board instructions, retry, and check the serial port again.
-5. Reset after flashing and inspect the OLED and serial logs.
-
-Do not use firmware for another board directly with this wiring scheme. Merged images and standalone application images require different flashing procedures. Use the addresses specified by the corresponding firmware package.
-
-### Option B: Build and Flash from Source
-
-Use this option when changing pins, display behavior, or device functions. Install the ESP-IDF version that matches the **source version actually in use**. Do not apply the latest upstream dependency requirements directly to an older tutorial project.
-
-In an ESP-IDF terminal, enter the project directory containing the top-level `CMakeLists.txt`. Select the appropriate XIAO ESP32-S3 board, Flash/PSRAM, display, and audio configuration, then follow the project instructions. Typical commands are shown below; they have not been validated in this repository:
-
-```sh
-idf.py set-target esp32s3
-idf.py menuconfig
-idf.py build
-idf.py -p COM5 flash monitor
-```
-
-Replace `COM5` with the actual port. On macOS/Linux, use the corresponding serial device path. A successful build alone does not confirm that the hardware pins match.
 
 ### Initial Network and Persona Setup
 
