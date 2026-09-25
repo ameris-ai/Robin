@@ -114,6 +114,8 @@ The following are translated test logs.
 
 **Execution environment: Google Colab GPU servers.** The ESP32-S3 runs inference after deployment; it does not perform training.
 
+our dataset link: https://drive.google.com/drive/folders/1EK1ILLRMS56QKw2to5H06XbWZlMbPcUc?usp=drive_link
+
 1. **Prepare the dataset.** Create an object detection dataset in Roboflow, draw bounding boxes around vegetables, assign the correct labels, and generate a fixed dataset version. The template downloads COCO data through the SDK and requires `train/_annotations.coco.json` and `valid/_annotations.coco.json`. An independent test split can be placed in `test/`. Images and their annotations belong in the corresponding split directory.
 2. **Prepare the repository.** After uploading this repository to GitHub, retrieve it in Colab with `!git clone <REPOSITORY_HTTPS_URL> /content/robin-ai-dialogue`. Alternatively, upload the complete `vision/` directory to `/content/robin-ai-dialogue/vision/` manually.
 3. **Open the notebook.** Choose “Upload notebook” in Colab and open `vision/robin_vegetable_swift_yolo_192.ipynb` from this repository. Select a GPU runtime, such as an available T4. GPU allocation is checked with `nvidia-smi`.
