@@ -111,6 +111,8 @@ ESP32-S3 同时更新 OLED 上的交互状态或表情。
 
 ### Colab 运行教程：训练自定义蔬菜模型
 
+**我们使用的数据集链接： https://drive.google.com/drive/folders/1EK1ILLRMS56QKw2to5H06XbWZlMbPcUc?usp=drive_link
+
 **执行位置：Google Colab 的 GPU 服务器。** ESP32-S3 执行部署后的推理，不承担训练。
 1. **准备数据。** 在 Roboflow 创建目标检测数据集，为蔬菜画框并标注真实类别，生成一个固定版本。模板通过 SDK 下载 COCO 格式，要求有 `train/_annotations.coco.json` 和 `valid/_annotations.coco.json`；独立测试集可放在 `test/`。图片与各自标注位于相同 split 目录。
 2. **准备仓库。** 将本仓库上传 GitHub 后，在 Colab 用 `!git clone <仓库 HTTPS 地址> /content/robin-ai-dialogue` 获取代码；也可以手动上传完整 `vision/` 目录到 `/content/robin-ai-dialogue/vision/`
